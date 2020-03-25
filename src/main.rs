@@ -1,5 +1,4 @@
 use chrono::Local;
-use dirs::home_dir;
 use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
 use retry;
 use std::env::args;
@@ -12,9 +11,9 @@ use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
 use std::thread;
 use std::time::Duration;
 
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 fn get_default_path() -> Result<PathBuf, String> {
-    match home_dir() {
+    match dirs::home_dir() {
         None => Err("Cannot get home directory".into()),
         Some(user_folder_path) => {
             Ok(user_folder_path.join("Documents\\Paradox Interactive\\Europa Universalis IV\\save games"))
@@ -22,14 +21,19 @@ fn get_default_path() -> Result<PathBuf, String> {
     }
 }
 
-#[cfg(target_os = "linux")]
-fn get_default_path() -> Result<PathBuf, !> {
+#[cfg(all(linux, not(target_os = "macos")))]
+fn get_default_path() -> Result<PathBuf, String> {
     Ok("~/.local/share/Paradox Interactive/Europa Universalis IV/save games/".into())
 }
 
-#[cfg(target_os = "macos")]
-fn get_default_path() -> Result<PathBuf, !> {
+#[cfg(all(linux, target_os = "macos"))]
+fn get_default_path() -> Result<PathBuf, String> {
     Ok("~/Documents/Paradox Interactive/Europa Universalis IV/save games/".into())
+}
+
+#[cfg(not(any(windows, linux)))]
+fn get_default_path() -> Result<PathBuf, String> {
+    Err("Unknown distribution, cannot provide default path".into())
 }
 
 fn main() -> Result<(), String> {
