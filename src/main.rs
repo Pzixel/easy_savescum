@@ -34,8 +34,8 @@ fn main() -> Result<(), &'static str> {
             {
                 handle_save_file(path, NonZeroU32::new(4).unwrap())
             }
-            Ok(_) => {} // ignore
-            Err(e) => eprintln!("{} watch error: {:?}", Local::now().format("%Y-%m-%dT%H:%M:%S"), e),
+            Ok(ev) => println!("{} Ignore event {:?}", Local::now().to_rfc3339(), ev),
+            Err(e) => eprintln!("{} watch error: {:?}", Local::now().to_rfc3339(), e),
         }
     }
 
@@ -44,7 +44,7 @@ fn main() -> Result<(), &'static str> {
 
 fn handle_save_file<P: AsRef<Path>>(path: P, frequency: NonZeroU32) {
     static mut CALLS: u32 = 0;
-
+        
     let path = path.as_ref();
     println!("{} Handling file {:?}", Local::now().to_rfc3339(), path);
     unsafe {
