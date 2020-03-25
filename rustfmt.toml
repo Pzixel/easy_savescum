@@ -1,5 +1,4 @@
 max_width = 120
-format_doc_comments = true
 normalize_comments = true
 normalize_doc_attributes = true
 format_strings = true

@@ -3,13 +3,15 @@ use dirs::home_dir;
 use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
 use retry;
 use std::env::args;
-use std::error::Error;
 use std::ffi::OsString;
-use std::num::NonZeroU32;
+use std::fs;
+use std::io::{self, BufRead};
+use std::num::{NonZeroU32, ParseIntError};
 use std::path::{Path, PathBuf};
-use std::sync::mpsc::channel;
+use std::sync::mpsc::{channel, Receiver};
+use std::sync::mpsc::{Sender, TryRecvError};
+use std::thread;
 use std::time::Duration;
-use std::{fs, io};
 
 #[cfg(windows)]
 fn get_default_path() -> Result<PathBuf, String> {
@@ -35,29 +37,78 @@ fn main() -> Result<(), String> {
             path
         }
     };
-    let (tx, rx) = channel();
-    let mut watcher = watcher(tx, Duration::from_millis(1)).unwrap();
-    watcher.watch(path, RecursiveMode::NonRecursive).unwrap();
-    let mut handler = SaveHandler::default();
-    loop {
-        match rx.recv() {
-            Ok(DebouncedEvent::Write(path))
-                if path.extension().unwrap_or_default() == "eu4"
-                    && !path
-                        .file_stem()
-                        .map(|file| file.to_string_lossy().ends_with("Backup"))
-                        .unwrap_or(false) =>
-            {
-                handler
-                    .handle_save_file(path, NonZeroU32::new(4).unwrap())
-                    .map_err(|e| e.to_string())?
-            }
-            Ok(ev) => println!("{} Ignore event {:?}", Local::now().to_rfc3339(), ev),
-            Err(e) => eprintln!("{} watch error: {:?}", Local::now().to_rfc3339(), e),
-        }
-    }
 
-    Ok(())
+    const DEFAULT_FREQUENCY: u32 = 4;
+    let mut frequency = NonZeroU32::new(DEFAULT_FREQUENCY).unwrap();
+    println!(
+        "This program will monitor all saves in directory {:?} and backup some of them.\nYou can change the default \
+         directory by running passing an argument to the program.\nYou can change frequency dynamically by typing it \
+         below.\nPress 'Ctrl+C' to break the loop",
+        &path
+    );
+    loop {
+        let (stop_tx, stop_rx) = channel();
+        let (stopped_tx, stopped_rx) = channel();
+        run_watch_loop(path.clone(), frequency, stop_rx, stopped_tx);
+        println!(
+            "Running with frequency of {}. Type a number below if you want to change it",
+            frequency.get()
+        );
+        frequency = io::stdin()
+            .lock()
+            .lines()
+            .map(|x| {
+                let x = x.map_err(|e| e.to_string())?;
+                x.parse().map_err(|e: ParseIntError| e.to_string())
+            })
+            .inspect(|r| {
+                if r.is_err() {
+                    println!("Couldn't parse line as a number");
+                }
+            })
+            .filter_map(|x| x.ok())
+            .next()
+            .unwrap();
+        stop_tx.send(()).unwrap();
+        println!("Got a new frequency! Change will be applied at next tick");
+        stopped_rx.recv().unwrap();
+    }
+}
+
+fn run_watch_loop(path: PathBuf, frequency: NonZeroU32, stop_rx: Receiver<()>, stopped_tx: Sender<()>) {
+    thread::spawn(move || {
+        let (tx, rx) = channel();
+        let mut watcher = watcher(tx, Duration::from_millis(1)).unwrap();
+        watcher.watch(path, RecursiveMode::NonRecursive).unwrap();
+        let mut handler = SaveHandler::default();
+        loop {
+            match stop_rx.try_recv() {
+                Ok(_) | Err(TryRecvError::Disconnected) => {
+                    println!("Aborting watch");
+                    stopped_tx.send(()).unwrap();
+                    break;
+                }
+                Err(TryRecvError::Empty) => {}
+            }
+
+            match rx.recv() {
+                Ok(DebouncedEvent::Write(path))
+                    if path.extension().unwrap_or_default() == "eu4"
+                        && !path
+                            .file_stem()
+                            .map(|file| file.to_string_lossy().ends_with("Backup"))
+                            .unwrap_or(false) =>
+                {
+                    let save_result = handler.handle_save_file(path, frequency).map_err(|e| e.to_string());
+                    if let Err(e) = save_result {
+                        eprintln!("{} save error: {:?}", Local::now().to_rfc3339(), e)
+                    }
+                }
+                Ok(ev) => println!("{} Ignore event {:?}", Local::now().to_rfc3339(), ev),
+                Err(e) => eprintln!("{} watch error: {:?}", Local::now().to_rfc3339(), e),
+            }
+        }
+    });
 }
 
 #[derive(Default)]
