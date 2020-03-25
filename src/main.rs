@@ -8,8 +8,7 @@ use std::fs;
 use std::io::{self, BufRead};
 use std::num::{NonZeroU32, ParseIntError};
 use std::path::{Path, PathBuf};
-use std::sync::mpsc::{channel, Receiver};
-use std::sync::mpsc::{Sender, TryRecvError};
+use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
 use std::thread;
 use std::time::Duration;
 
@@ -41,9 +40,10 @@ fn main() -> Result<(), String> {
     const DEFAULT_FREQUENCY: u32 = 4;
     let mut frequency = NonZeroU32::new(DEFAULT_FREQUENCY).unwrap();
     println!(
-        "This program will monitor all saves in directory {:?} and backup some of them.\nYou can change the default \
-         directory by running passing an argument to the program.\nYou can change frequency dynamically by typing it \
-         below.\nPress 'Ctrl+C' to break the loop",
+        "This program will monitor all saves in directory {:?} and backup some of them.\
+         \nYou can change the default directory by passing an argument to the program on start.\
+         \nYou can change frequency dynamically by typing it below.\
+         \nPress 'Ctrl+C' to break the loop",
         &path
     );
     loop {
