@@ -12,7 +12,7 @@ use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
 use std::thread;
 use std::time::Duration;
 
-#[cfg(windows)]
+#[cfg(target_os = "windows")]
 fn get_default_path() -> Result<PathBuf, String> {
     match home_dir() {
         None => Err("Cannot get home directory".into()),
@@ -20,6 +20,16 @@ fn get_default_path() -> Result<PathBuf, String> {
             Ok(user_folder_path.join("Documents\\Paradox Interactive\\Europa Universalis IV\\save games"))
         }
     }
+}
+
+#[cfg(target_os = "linux")]
+fn get_default_path() -> Result<PathBuf, !> {
+    Ok("~/.local/share/Paradox Interactive/Europa Universalis IV/save games/".into())
+}
+
+#[cfg(target_os = "macos")]
+fn get_default_path() -> Result<PathBuf, !> {
+    Ok("~/Documents/Paradox Interactive/Europa Universalis IV/save games/".into())
 }
 
 fn main() -> Result<(), String> {
