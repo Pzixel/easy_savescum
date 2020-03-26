@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
 use std::thread;
 use std::time::Duration;
+use std::collections::HashMap;
 
 #[cfg(windows)]
 fn get_default_path() -> Result<PathBuf, String> {
@@ -127,7 +128,7 @@ fn run_watch_loop(path: PathBuf, frequency: NonZeroU32, stop_rx: Receiver<()>, s
 
 #[derive(Default)]
 struct SaveHandler {
-    calls: u32,
+    calls: HashMap<PathBuf, u32>,
 }
 
 impl SaveHandler {
@@ -138,7 +139,8 @@ impl SaveHandler {
     ) -> Result<(), retry::Error<io::Error>> {
         let path = path.as_ref();
         println!("{} Handling file {:?}", Local::now().to_rfc3339(), path);
-        if self.calls % frequency.get() == 0 {
+        let calls = self.calls.entry(path.into()).or_default();
+        if *calls % frequency.get() == 0 {
             let new_path = get_new_path(path);
             println!("{} Copying {:?} to {:?}", Local::now().to_rfc3339(), path, new_path);
             retry::retry(retry::delay::Fixed::from_millis(200).take(10), move || {
@@ -147,7 +149,7 @@ impl SaveHandler {
         } else {
             println!("{} Skipping saving {:?}: Not time yet", Local::now().to_rfc3339(), path);
         }
-        self.calls += 1;
+        *calls += 1;
         Ok(())
     }
 }
