@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - '*'
-
 jobs:
   publish:
     name: Publish for ${{ matrix.os }}
@@ -23,7 +22,7 @@ jobs:
             asset_name: easy_savescum-macos-amd64
 
     steps:
-    - uses: hecrj/setup-rust-action@v1-release
+    - uses: hecrj/setup-rust-action@v1
       with:
         rust-version: stable
     - uses: actions/checkout@v1
