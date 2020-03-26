@@ -153,9 +153,10 @@ impl SaveHandler {
 }
 
 fn get_new_path(p: &Path) -> PathBuf {
-    let mut result = OsString::from(p);
-    result.push("_");
-    result.push(format!("{}", Local::now().timestamp()));
-    result.push("_Backup");
-    result.into()
+    let mut path = OsString::from(p.with_extension(""));
+    path.push("_");
+    path.push(format!("{}", Local::now().timestamp()));
+    path.push("_Backup");
+    let result: PathBuf = path.into();
+    result.with_extension(p.extension().unwrap())
 }
