@@ -16,7 +16,7 @@ jobs:
             asset_name: easy_savescum-linux-amd64
           - os: windows-latest
             artifact_name: easy_savescum.exe
-            asset_name: easy_savescum-windows-amd64
+            asset_name: easy_savescum-windows-amd64.exe
           - os: macos-latest
             artifact_name: easy_savescum
             asset_name: easy_savescum-macos-amd64
