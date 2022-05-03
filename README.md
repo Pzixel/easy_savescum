@@ -1,24 +1,14 @@
-# EU4 save scum tool
+# Ironman backup utility
 
 ![](https://github.com/Pzixel/easy_savescum/workflows/Publish/badge.svg)
 
 Automate your save backuping shenanigans with power of Rust
 
-![image](https://user-images.githubusercontent.com/11201122/77762830-2727cf80-704b-11ea-807c-d8db73167afc.png)
-
 ### How to use
 
-You can download the app [in `releases` tab](https://github.com/Pzixel/easy_savescum/releases). There are Windows/Mac/Linux versions, although I've only tested a Windows one (I don't have Mac or Linux), but they should work. Then just downaload and execute.
+You can download the app [in `releases` tab](https://github.com/Pzixel/easy_savescum/releases). T
 
 If you're using a different folder for saves then you need to open `command prompt`/`powershell`/`...younameit` in directory with the app and run the program with arguments, e.g.
-
-### Motivation 
-
-I think I need to start with motivation "Why would anyone do such a terrible thing". So I'l tell a little story. I've played most countries in the game, and I wanted to try Ryukyu. But I knew it's a very hard campaign so I started watchin florryworry streams. Surprisingly, even this god-on-the-earth couldn't manage the campaign without ALT+F4. He's laughing at "birding" but anyway, he's doing it, and quite a lot. I think I counted tens of times on the first video. 
-
-I'm no match to florry so I decided that I need a tool. I also wanted to play with programming such a tool, so there were two reasons, actually. Also, one year ago there was a post about [such a tool](https://www.reddit.com/r/eu4/comments/akxb5w/no_more_altf4_try_out_new_automatic_save_scumming/) which was warmly accepted, although people complained about several issues.
-
-Now I present the tool:
 
 ### Tool
 
@@ -26,7 +16,6 @@ This is a program I've called `easy_savescum`. It does nothing special: it monit
 
 
 ```bash
-./easy_savescum-windows-refs.tags.v0.1.3-amd64 "C:\Program Files (x86)\and\so\on"
+./easy_savescum-windows-refs.tags.v0.1.4-amd64 --path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveData' --savescum-dir-path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveScum'
 ```
 
-P.S. Is actually not specific for the EU, it can backup any game which has autosaves and allows to load them, such as CK2, Imperator, etc.
