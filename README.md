@@ -16,6 +16,8 @@ This is a program I've called `easy_savescum`. It does nothing special: it monit
 
 
 ```bash
-./easy_savescum-windows-refs.tags.v0.1.4-amd64 --path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveData' --savescum-dir-path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveScum'
+./easy_savescum-windows-refs.tags.v0.1.4-amd64 \
+  --path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveData' \
+  --savescum-dir-path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveScum'
 ```
 
