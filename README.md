@@ -6,7 +6,7 @@ Automate your save backuping shenanigans with power of Rust
 
 ### How to use
 
-You can download the app [in `releases` tab](https://github.com/Pzixel/easy_savescum/releases). T
+You can download the app [in `releases` tab](https://github.com/Pzixel/easy_savescum/releases).
 
 If you're using a different folder for saves then you need to open `command prompt`/`powershell`/`...younameit` in directory with the app and run the program with arguments, e.g.
 
