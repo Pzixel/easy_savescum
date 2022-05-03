@@ -21,3 +21,6 @@ This is a program I've called `easy_savescum`. It does nothing special: it monit
   --savescum-dir-path '/Users/pzixel/Library/Application Support/Feral Interactive/XCOM 2 WotC/VFS/Local/my games/XCOM2 War of the Chosen/XComGame/SaveScum'
 ```
 
+Note that on mac you may need to add application to exceptions to allow it to run
+
+![](https://i.imgur.com/4Q2vltF.png)
